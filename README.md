@@ -1,6 +1,7 @@
 # 折线图
 项目需求默默的自定义了一个折线图，封装那块还不够完善后期会慢慢完善，但是功能上可以给各位看官提供参考、思路。
 主要就CustomChartView、ChartCurrentView，其中CustomChartView是用来封装画线的类，ChartCurrentView是封装选中某天日期的信息。
+![折线图](http://upload-images.jianshu.io/upload_images/1793034-c9f442f8f71f7941.gif?imageMogr2/auto-orient/strip)
 ### CustomChartView
 初始化：
 ```
