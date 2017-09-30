@@ -9,6 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "ChartCurrentView.h"
 
+typedef NS_ENUM(NSInteger, ChartAnimationType)
+{
+    chartAnimationNone = 0,
+    chartAnimationLinear,
+    chartAnimationEaseOut,
+    chartAnimationEaseIn,
+    chartAnimationEaseInEaseOut
+};
+
 #define Color_Bg [UIColor colorWithRed:242/255.0 green:247/255.0 blue:249/255.0 alpha:1]
 
 #define Color_Line [UIColor colorWithRed:231/255.0 green:241/255.0 blue:245/255.0 alpha:1]
@@ -68,9 +77,18 @@
  日期
  */
 @property (nonatomic, strong) NSArray * timeAry;
-
+/**
+ 详细信息
+ */
 @property (nonatomic, strong) ChartCurrentView * currentView;
-
+/**
+ 设置动画类型
+ */
+@property (nonatomic, assign) ChartAnimationType animationType;
+/**
+ 动画时长
+ */
+@property (nonatomic, assign) CGFloat animationTime;
 /**
  初始化
 
@@ -95,5 +113,11 @@
  @param timeAry 日期数据
  */
 - (void)setCustomChartWithIncomeColor:(UIColor *)incomeColor incomeData:(NSArray *)incomeAry refundColor:(UIColor *)refundColor refundData:(NSArray *)refundAry maxCount:(CGFloat)maxCount timeData:(NSArray *)timeAry;
+/**
+ 设置动画
 
+ @param animationType 动画类型
+ @param time 动画时长
+ */
+- (void)setChartAnimationType:(ChartAnimationType)animationType animationTime:(CGFloat)time;
 @end

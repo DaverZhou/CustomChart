@@ -146,53 +146,91 @@
 }
 - (void)drawLineWithCuttingLineCount:(int)count
 {
+    if (count == 0) {
+        return;
+    }
+    CAShapeLayer * cutLayer = [CAShapeLayer layer];
+    cutLayer.frame = self.bounds;
+    cutLayer.fillColor = [UIColor clearColor].CGColor;
+    cutLayer.lineWidth = 1;
+    cutLayer.strokeColor = Color_Line.CGColor;
+    
+    UIBezierPath *cutPath = [UIBezierPath bezierPath];
+    
     for (int i = 0; i < count; i ++) {
-        CAShapeLayer * cutLayer = [CAShapeLayer layer];
-        cutLayer.frame = self.bounds;
-        cutLayer.fillColor = [UIColor clearColor].CGColor;
-        cutLayer.lineWidth = 1;
-        cutLayer.strokeColor = Color_Line.CGColor;
-        
-        UIBezierPath *cutPath = [UIBezierPath bezierPath];
-        
         [cutPath moveToPoint:CGPointMake(_columnWidth * i + SCR_W(10), 0)];
         
         [cutPath addLineToPoint:CGPointMake(_columnWidth * i + SCR_W(10), SCR_W(280))];
         
         cutLayer.path = cutPath.CGPath;
-        
-        [self.layer insertSublayer:cutLayer atIndex:0];
     }
+	[self.layer insertSublayer:cutLayer atIndex:0];
 }
 - (void)drawLineWithBrokenLintData:(NSArray *)dataAry lineColor:(UIColor *)lineColor
 {
-    [dataAry enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        //折线
-        if (idx == _column - 1) {
-            return ;
-        }
-        CAShapeLayer * shapeLayer = [CAShapeLayer layer];
-        shapeLayer.frame = self.bounds;
-        shapeLayer.fillColor = [UIColor clearColor].CGColor;
-        shapeLayer.lineWidth = 1;
-        shapeLayer.strokeColor = lineColor.CGColor;
+    if (dataAry.count == 0) {
+        return;
+    }
+    CAShapeLayer * shapeLayer = [CAShapeLayer layer];
+    shapeLayer.frame = self.bounds;
+    shapeLayer.fillColor = [UIColor clearColor].CGColor;
+    shapeLayer.lineWidth = 1;
+    shapeLayer.strokeColor = lineColor.CGColor;
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    for (int idx = 0; idx < dataAry.count - 1; idx++) {
         
         CGFloat startY = SCR_W(256) - [dataAry[idx] floatValue] * _scale;
         
         CGFloat endY = SCR_W(256) - [dataAry[idx + 1] floatValue] * _scale;
-        
-        UIBezierPath *path = [UIBezierPath bezierPath];
         
         [path moveToPoint:CGPointMake(_columnWidth * idx + SCR_W(10), startY)];
         
         [path addLineToPoint:CGPointMake(_columnWidth * (idx + 1) + SCR_W(10), endY)];
         
         shapeLayer.path = path.CGPath;
-        
-        [self.layer insertSublayer:shapeLayer below:_currentView.layer];
-    }];
+    }
+    [self.layer insertSublayer:shapeLayer below:_currentView.layer];
+    //设置动画
+//    [shapeLayer addAnimation:[self animationFunctionWithName:_animationType] forKey:@"strokeEnd"];
 }
+- (void)setChartAnimationType:(ChartAnimationType)animationType animationTime:(CGFloat)time
+{
+    _animationType = animationType;
+    
+    _animationTime = time;
+}
+//动画
+- (CABasicAnimation *)animationFunctionWithName:(ChartAnimationType)animationType
+{
+    _animationTime = _animationTime > 0 ? _animationTime : 1.0;
+    
+    CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
+    pathAnimation.duration = _animationTime;
+    pathAnimation.fromValue = @(0);
+    pathAnimation.toValue = @(1);
 
+    switch (animationType) {
+        case chartAnimationNone:
+            pathAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
+            break;
+        case chartAnimationLinear:
+            pathAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+            break;
+        case chartAnimationEaseOut:
+            pathAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+            break;
+        case chartAnimationEaseIn:
+            pathAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+            break;
+        case chartAnimationEaseInEaseOut:
+            pathAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+            break;
+        default:
+            break;
+    }
+    return pathAnimation;
+}
 
 - (void)layoutSubviews
 {
